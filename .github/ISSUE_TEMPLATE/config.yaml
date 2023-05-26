@@ -1,8 +1,6 @@
 ---
-name: ISSUE
-about: Template ISSUE Treidi Server
+name: pull_request_template
+about: Template PR Treidi Server
 title: "[DATE]: [FEATURE NAME]"
-labels:
-assignees:
 ---
 
