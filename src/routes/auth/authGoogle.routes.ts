@@ -1,19 +1,23 @@
 import express from "express";
 import passport from "passport";
 
+require("../../services/googleOAuth2.service");
+
 const app = express();
 
 app.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile"] })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
+  passport.authenticate("google", {
+    successRedirect: "http://localhost:3000",
+    failureRedirect: "/login",
+  }),
   function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect("/");
+    res.json({ user: req.user });
   }
 );
 
