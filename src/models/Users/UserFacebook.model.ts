@@ -1,26 +1,46 @@
 import prisma from "../../libs/Prisma";
 import { UserFacebook } from "@prisma/client";
-import { UserFacebookTreidi } from "../../entities/Users/UserFacebook.entities";
+import {
+  UserFacebookTreidi,
+  RequestUserFacebook,
+} from "../../entities/Users/UserFacebook.entities";
 
-export const findUser = async (
-  query: UserFacebookTreidi
-): Promise<UserFacebook | null> => {
-  return await prisma.userFacebook.findUnique({
-    where: { email: query.email },
-  });
-};
+export class UserFacebookPrisma {
+  findUser = async (
+    payload: RequestUserFacebook
+  ): Promise<UserFacebook | null> => {
+    return await prisma.userFacebook.findUnique({
+      where: {
+        idFacebook: payload.idFacebook,
+      },
+    });
+  };
 
-export const createUser = async (
-  data: UserFacebookTreidi
-): Promise<UserFacebook> => {
-  return await prisma.userFacebook.create({
-    data,
-  });
-};
+  findUserById = async (id: string): Promise<UserFacebook | null> => {
+    return await prisma.userFacebook.findUnique({
+      where: {
+        idFacebook: id,
+      },
+    });
+  };
 
-export const updateUser = async (
-  id: number,
-  data: UserFacebookTreidi
-): Promise<UserFacebook> => {
-  return await prisma.userFacebook.update({ where: { id }, data });
-};
+  createUser = async (data: UserFacebookTreidi): Promise<UserFacebook> => {
+    const { idFacebook, fullName, email, token } = data;
+    const emailValue: string = email ?? "";
+    return await prisma.userFacebook.create({
+      data: {
+        idFacebook,
+        fullName,
+        email: emailValue,
+        token,
+      },
+    });
+  };
+
+  updateUser = async (id: number, email: string): Promise<UserFacebook> => {
+    return await prisma.userFacebook.update({
+      where: { id },
+      data: { email: email },
+    });
+  };
+}
