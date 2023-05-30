@@ -3,8 +3,8 @@ export class UserTreidi {
   apellidos: string;
   email: string;
   genero: string;
-  role: Role;
-  guide: boolean;
+  role?: Role;
+  guide?: boolean;
 
   constructor(
     name: string,
