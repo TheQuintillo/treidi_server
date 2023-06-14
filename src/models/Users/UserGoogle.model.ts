@@ -7,12 +7,22 @@ import {
 } from "../../entities/Users/UserGoogle.entities";
 
 export class UserGooglePrisma {
-  findUser = async (payload: RequestUserGoogle): Promise<UserGoogle | null> => {
-    return await prisma.userGoogle.findUnique({
-      where: {
-        email: payload.email,
-      },
-    });
+  findUser = async (
+    payload: RequestUserGoogle | string
+  ): Promise<UserGoogle | null> => {
+    if (typeof payload === "string") {
+      return await prisma.userGoogle.findUnique({
+        where: {
+          email: payload,
+        },
+      });
+    } else {
+      return await prisma.userGoogle.findUnique({
+        where: {
+          email: payload.email,
+        },
+      });
+    }
   };
 
   createUser = async (data: UserGoogleTreidi): Promise<UserGoogle> => {
@@ -22,9 +32,9 @@ export class UserGooglePrisma {
   };
 
   updateUser = async (
-    id: number,
+    email: string,
     data: UserGoogleTreidi
   ): Promise<UserGoogle> => {
-    return await prisma.userGoogle.update({ where: { id }, data });
+    return await prisma.userGoogle.update({ where: { email }, data });
   };
 }
