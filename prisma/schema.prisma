@@ -12,13 +12,16 @@ datasource db {
 
 model User {
   id        Int     @id @default(autoincrement())
-  name      String
-  apellidos String
-  email     String  @unique
-  genero    String
+  name      String?
+  apellidos String?
+  email     String?  @unique
+  genero    String?
+  idGoogle  String? @unique
+  idFacebook String? @unique
   role      Role    @default(USER)
   setUser   Boolean @default(false)
   guide     Boolean @default(false)
+  provider String? 
 
 }
 
