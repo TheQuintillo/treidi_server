@@ -69,7 +69,7 @@ enum Calidad {
   malo
   bueno
   excelente
-  Nuevo
+  nuevo
 }
 
 model Provider {
