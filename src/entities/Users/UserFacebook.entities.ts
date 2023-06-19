@@ -12,12 +12,3 @@ export class UserFacebookTreidi {
     this.provider = provider; // Inicializa expiresAt con la fecha actual
   }
 }
-
-export interface RequestUserFacebook {
-  idFacebook?: string;
-  idGoogle?: string;
-  token: string;
-  expiresAt?: Date;
-  provider: string;
-  id?: number;
-}
