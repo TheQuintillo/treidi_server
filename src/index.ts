@@ -9,10 +9,10 @@ import passport from "passport";
 import session from "./middlewares/session.middleware";
 
 const app = express();
-
-app.use(cors({ origin: true, credentials: true }));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors({ origin: true, credentials: true }));
+
 app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());

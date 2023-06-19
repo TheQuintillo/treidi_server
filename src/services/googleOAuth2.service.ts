@@ -1,12 +1,10 @@
 import passport from "passport";
 import { UserGoogleTreidi } from "../entities/Users/UserGoogle.entities";
 import { UserGooglePrisma } from "../models/Users/UserGoogle.model";
-import { UserPrisma } from "../models/Users/User.model";
 
 var GoogleStrategy = require("passport-google-oauth20").Strategy;
 
-const userGoogle = new UserGooglePrisma();
-const user = new UserPrisma();
+const userGooglePrisma = new UserGooglePrisma();
 
 passport.use(
   new GoogleStrategy(
@@ -21,44 +19,20 @@ passport.use(
       profile: any,
       cb: any
     ) {
-      const findUserGoogle = await userGoogle.findUser(profile.emails[0].value);
-      const findUser = await user.findUserEmail(profile.emails[0].value);
-
-      if (findUserGoogle || findUser) {
-        if (findUser?.email) {
-          await user.updateUser(findUser.email, {
-            idGoogle: profile.id,
-            provider: "google",
-          });
-          return cb(null, findUser);
-        } else {
-          const createUser = await user.createUser({
-            name: profile.displayName,
-            apellidos: profile.displayName,
-            email: profile.emails[0].value,
-            idGoogle: profile.id,
-          });
-          return cb(null, findUserGoogle);
-        }
-      } else {
-        const User = new UserGoogleTreidi(
+      const userGoogle = new UserGoogleTreidi(
+        profile.id,
+        accessToken,
+        profile.provider
+      );
+      const findUser = await userGooglePrisma.findUser(userGoogle);
+      if (findUser) {
+        const updateToken = await userGooglePrisma.updateUser(
           profile.id,
-          profile.displayName,
-          profile.emails[0].value,
-          profile.photos[0].value,
           accessToken
         );
-
-        const createUserNew = await user.createUser({
-          name: profile.displayName,
-          apellidos: profile.displayName,
-          email: profile.emails[0].value,
-          idGoogle: profile.id,
-          provider: "google",
-        });
-        const createUser = await userGoogle.createUser(User);
-
-        return cb(null, createUser);
+        return cb(null, updateToken);
+      } else {
+        return cb(null, userGoogle);
       }
     }
   )

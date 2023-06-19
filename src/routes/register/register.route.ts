@@ -1,83 +1,80 @@
 import { Router } from "express";
 import { UserPrisma } from "../../models/Users/User.model";
-import { UserTreidi } from "@src/entities/Users/User.entities";
 import { UserFacebookPrisma } from "../../models/Users/UserFacebook.model";
 import { UserGooglePrisma } from "../../models/Users/UserGoogle.model";
-import { RequestUserFacebook } from "@src/entities/Users/UserFacebook.entities";
-import { RequestUserGoogle } from "@src/entities/Users/UserGoogle.entities";
+import { UserFacebookTreidi } from "../../entities/Users/UserFacebook.entities";
+import { UserGoogleTreidi } from "../../entities/Users/UserGoogle.entities";
+import { UserTreidi, RequestUser } from "../../entities/Users/User.entities";
 
 const router = Router();
 const user = new UserPrisma();
-const userFacebook = new UserFacebookPrisma();
-const userGoogle = new UserGooglePrisma();
+const facebook = new UserFacebookPrisma();
+const google = new UserGooglePrisma();
 
 router.post("/", async (req, res) => {
   try {
-    const { email, name, apellidos, genero } = req.body;
-
+    const { email, nombre, apellidos, genero } = req.body;
+    const { provider } = req.user as RequestUser;
     if (req.user) {
-      const findUser = await user.findUserEmail(email);
-      if (findUser) {
-        if (findUser.idGoogle) {
-          const findUserFacebook = await userFacebook.findUser(
-            req.user as RequestUserFacebook
-          );
-          return await user.updateUser(email, {
-            idFacebook: findUserFacebook?.idFacebook,
-            name: name,
-            email: email,
-            apellidos: apellidos,
-            genero: genero,
-            provider: "facebook",
-          });
-        } else if (findUser.idFacebook) {
-          const findUserGoogle = await userGoogle.findUser(
-            req.user as RequestUserGoogle
-          );
-          return await user.updateUser(email, {
-            idGoogle: findUserGoogle?.idGoogle,
-            name: name,
-            email: email,
-            apellidos: apellidos,
-            genero: genero,
-          });
-        }
-      } else {
-        return await user.updateUserFirst(req.user, {
-          name: name,
-          email: email,
-          apellidos: apellidos,
-          genero: genero,
-        });
+      const createUser = await user.createUser({
+        email,
+        nombre,
+        apellidos,
+        genero,
+      });
+      const findUser = await user.findUser(email);
+      if (findUser && provider === "facebook") {
+        const foreignTokenFacebook = await facebook.createUser(
+          req.user as UserFacebookTreidi,
+          findUser.id
+        );
+        res.json({ user: findUser });
+      } else if (findUser && provider === "google") {
+        const foreignTokenGoogle = await google.createUser(
+          req.user as UserGoogleTreidi,
+          findUser.id
+        );
       }
+      res.json({ user: "User Created Successfully" });
+    } else {
     }
-
-    res.json({ user: req.user });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ message: "Email registrado" });
   }
 });
 
 router.get("/get", async (req, res) => {
   if (req.user) {
-    const findGuide = await user.findUserId(req.user as UserTreidi);
-    if (findGuide?.provider === "facebook") {
-      res.json({
-        user: req.user,
-        idFacebook: findGuide?.idFacebook,
-        id: findGuide?.id,
-        guide: findGuide?.guide,
-      });
-    } else if (findGuide?.provider === "google") {
-      res.json({
-        user: req.user,
-        idGoogle: findGuide?.idGoogle,
-        id: findGuide?.id,
-        guide: findGuide?.guide,
-      });
+    const { provider } = req.user as RequestUser;
+    if (provider === "facebook") {
+      const findUser = await facebook.findUser(req.user as UserFacebookTreidi);
+      if (findUser) {
+        const userTreidi = await user.findUserById(findUser.userId);
+        if (userTreidi) {
+          res.json({
+            user: userTreidi,
+            id: userTreidi.id,
+            guide: userTreidi.guide,
+            idFacebook: findUser.idFacebook,
+          });
+        }
+      }
+    } else if (provider === "google") {
+      const findUser = await google.findUser(req.user as UserGoogleTreidi);
+      if (findUser) {
+        const userTreidi = await user.findUserById(findUser.userId);
+        if (userTreidi) {
+          res.json({
+            user: userTreidi,
+            id: userTreidi.id,
+            guide: userTreidi.guide,
+            idGoogle: findUser.idGoogle,
+          });
+        }
+      }
+    } else {
+      res.json({ user: "User Not Found" });
     }
-  } else {
-    res.json({ msg: "Empty" });
   }
 });
 

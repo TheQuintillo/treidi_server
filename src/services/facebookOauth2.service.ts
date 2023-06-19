@@ -1,12 +1,9 @@
 import passport from "passport";
 import { UserFacebookTreidi } from "../entities/Users/UserFacebook.entities";
-import { UserPrisma } from "../models/Users/User.model";
 import { UserFacebookPrisma } from "../models/Users/UserFacebook.model";
 
 const FacebookStrategy = require("passport-facebook");
-
 const userFacebook = new UserFacebookPrisma();
-const user = new UserPrisma();
 
 passport.use(
   new FacebookStrategy(
@@ -22,35 +19,20 @@ passport.use(
       profile: any,
       cb: any
     ) {
-      const findUserFacebook = await userFacebook.findUserById(profile.id);
-      const findUser = await user.findUserIdFacebook(profile.id);
-      console.log(profile);
-      console.log(profile);
-      if (findUserFacebook) {
-        if (findUser) {
-          await user.updateUserFacebook(profile.id, {
-            provider: profile.provider,
-          });
-          return cb(null, findUser);
-        }
-        return cb(null, findUserFacebook);
-      } else {
-        const User = new UserFacebookTreidi(
+      const userFacebookCreate = new UserFacebookTreidi(
+        profile.id,
+        accessToken,
+        profile.provider
+      );
+      const findUser = await userFacebook.findUser(userFacebookCreate);
+      if (findUser) {
+        const updateToken = await userFacebook.updateUser(
           profile.id,
-          profile.name.givenName + " " + profile.name.familyName,
-          profile.email,
           accessToken
         );
-
-        const createUserNew = await user.createUser({
-          name: profile.name.givenName,
-          apellidos: profile.name.familyName,
-          idFacebook: profile.id,
-          provider: profile.provider,
-        });
-        const createUser = await userFacebook.createUser(User);
-
-        return cb(null, createUser);
+        return cb(null, updateToken);
+      } else {
+        return cb(null, userFacebookCreate);
       }
     }
   )

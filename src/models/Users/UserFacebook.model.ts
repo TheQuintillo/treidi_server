@@ -1,46 +1,51 @@
 import prisma from "../../libs/Prisma";
-import { UserFacebook } from "@prisma/client";
-import {
-  UserFacebookTreidi,
-  RequestUserFacebook,
-} from "../../entities/Users/UserFacebook.entities";
+import { UserFacebookTreidi } from "@src/entities/Users/UserFacebook.entities";
+import { Session } from "@prisma/client";
 
 export class UserFacebookPrisma {
-  findUser = async (
-    payload: RequestUserFacebook
-  ): Promise<UserFacebook | null> => {
-    return await prisma.userFacebook.findUnique({
+  createUser = async (
+    payload: UserFacebookTreidi,
+    id?: number
+  ): Promise<Session | null> => {
+    return await prisma.session.create({
+      data: {
+        idFacebook: payload.idFacebook,
+        token: payload.token,
+        expiresAt: new Date(),
+        provider: payload.provider,
+        user: { connect: { id: id } }, // Establece un valor predeterminado para expiresAt o proporciona un valor válido según tus necesidades
+      },
+    });
+  };
+
+  findUserPassportService = async (payload: any): Promise<Session | null> => {
+    return await prisma.session.findUnique({
+      where: {
+        idFacebook: payload.id,
+      },
+    });
+  };
+
+  findUser = async (payload: UserFacebookTreidi): Promise<Session | null> => {
+    return await prisma.session.findUnique({
       where: {
         idFacebook: payload.idFacebook,
       },
     });
   };
 
-  findUserById = async (id: string): Promise<UserFacebook | null> => {
-    return await prisma.userFacebook.findUnique({
-      where: {
-        idFacebook: id,
-      },
-    });
-  };
-
-  createUser = async (data: UserFacebookTreidi): Promise<UserFacebook> => {
-    const { idFacebook, fullName, email, token } = data;
-    const emailValue: string = email ?? "";
-    return await prisma.userFacebook.create({
+  updateUser = async (
+    idFacebook: string,
+    token: string
+  ): Promise<Session | null> => {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 3);
+    return await prisma.session.update({
+      where: { idFacebook },
       data: {
-        idFacebook,
-        fullName,
-        email: emailValue,
-        token,
+        token: { push: token },
+        expiresAt: expiresAt,
       },
-    });
-  };
-
-  updateUser = async (id: number, email: string): Promise<UserFacebook> => {
-    return await prisma.userFacebook.update({
-      where: { id },
-      data: { email: email },
     });
   };
 }

@@ -13,7 +13,7 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    successRedirect: "http://localhost:3000",
+    successRedirect: "http://localhost:3000/user",
     failureRedirect: "/login",
   }),
   function (req, res) {

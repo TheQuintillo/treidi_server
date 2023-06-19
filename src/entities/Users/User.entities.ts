@@ -1,38 +1,44 @@
 export class UserTreidi {
-  name?: string;
+  nombre?: string;
   apellidos?: string;
   email?: string;
   genero?: string;
   role?: Role;
   guide?: boolean;
-  idFacebook?: string;
-  idGoogle?: string;
-  provider?: string;
+  setUser?: boolean;
+  token?: string;
 
   constructor(
-    name: string,
+    nombre: string,
     apellidos: string,
     email: string,
     genero: string,
     role: Role,
     guide: boolean,
-    idFacebook: string,
-    idGoogle: string,
-    provider: string
+    setUser: boolean,
+    token: string
   ) {
-    this.name = name;
+    this.nombre = nombre;
     this.apellidos = apellidos;
     this.email = email;
     this.genero = genero;
     this.role = role;
     this.guide = guide;
-    this.idFacebook = idFacebook;
-    this.idGoogle = idGoogle;
-    this.provider = provider;
+    this.setUser = setUser;
+    this.token = token;
   }
 }
 
 enum Role {
   USER = "USER",
   ADMIN = "ADMIN",
+}
+
+export interface RequestUser {
+  idFacebook?: string;
+  idGoogle?: string;
+  token: string;
+  expiresAt?: Date;
+  provider: string;
+  id?: number;
 }

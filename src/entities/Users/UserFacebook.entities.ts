@@ -1,30 +1,23 @@
 export class UserFacebookTreidi {
-  idFacebook;
-  fullName: string;
-  email?: string | undefined;
+  idFacebook: string;
   token: string;
+  expiresAt?: Date;
+  provider: string;
+  id?: number;
 
-  constructor(
-    idFacebook: string,
-    fullName: string,
-    email: string,
-    token: string
-  ) {
+  constructor(idFacebook: string, token: string, provider: string) {
     this.idFacebook = idFacebook;
-    this.fullName = fullName;
-    this.email = email;
     this.token = token;
+    this.expiresAt = new Date();
+    this.provider = provider; // Inicializa expiresAt con la fecha actual
   }
 }
 
 export interface RequestUserFacebook {
-  idFacebook: string;
-  fullName: string;
-  email: string;
+  idFacebook?: string;
+  idGoogle?: string;
   token: string;
-}
-
-export interface FindUserFacebookTreidi
-  extends Omit<UserFacebookTreidi, "fullName" | "email" | "picture" | "token"> {
-  email: string;
+  expiresAt?: Date;
+  provider: string;
+  id?: number;
 }

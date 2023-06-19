@@ -1,40 +1,43 @@
 import prisma from "../../libs/Prisma";
-import { UserGoogle } from "@prisma/client";
-import {
-  UserGoogleTreidi,
-  FindUserGoogleTreidi,
-  RequestUserGoogle,
-} from "../../entities/Users/UserGoogle.entities";
+import { UserGoogleTreidi } from "../../entities/Users/UserGoogle.entities";
+import { Session } from "@prisma/client";
 
 export class UserGooglePrisma {
-  findUser = async (
-    payload: RequestUserGoogle | string
-  ): Promise<UserGoogle | null> => {
-    if (typeof payload === "string") {
-      return await prisma.userGoogle.findUnique({
-        where: {
-          email: payload,
-        },
-      });
-    } else {
-      return await prisma.userGoogle.findUnique({
-        where: {
-          email: payload.email,
-        },
-      });
-    }
+  createUser = async (
+    payload: UserGoogleTreidi,
+    id?: number
+  ): Promise<Session | null> => {
+    return await prisma.session.create({
+      data: {
+        idGoogle: payload.idGoogle,
+        token: payload.token,
+        expiresAt: new Date(),
+        provider: payload.provider,
+        user: { connect: { id: id } }, // Establece un valor predeterminado para expiresAt o proporciona un valor válido según tus necesidades
+      },
+    });
   };
 
-  createUser = async (data: UserGoogleTreidi): Promise<UserGoogle> => {
-    return await prisma.userGoogle.create({
-      data,
+  findUser = async (payload: any): Promise<Session | null> => {
+    return await prisma.session.findUnique({
+      where: {
+        idGoogle: payload.idGoogle,
+      },
     });
   };
 
   updateUser = async (
-    email: string,
-    data: UserGoogleTreidi
-  ): Promise<UserGoogle> => {
-    return await prisma.userGoogle.update({ where: { email }, data });
+    idGoogle: string,
+    token: string
+  ): Promise<Session | null> => {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 3);
+    return await prisma.session.update({
+      where: { idGoogle },
+      data: {
+        token: { push: token },
+        expiresAt: expiresAt,
+      },
+    });
   };
 }

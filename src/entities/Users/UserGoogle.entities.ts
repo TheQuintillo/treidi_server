@@ -1,34 +1,14 @@
 export class UserGoogleTreidi {
   idGoogle: string;
-  fullName: string;
-  email: string;
-  picture: string;
   token: string;
+  expiresAt?: Date;
+  provider: string;
+  id?: number;
 
-  constructor(
-    idGoogle: string,
-    fullName: string,
-    email: string,
-    picture: string,
-    token: string
-  ) {
+  constructor(idGoogle: string, token: string, provider: string) {
     this.idGoogle = idGoogle;
-    this.fullName = fullName;
-    this.email = email;
-    this.picture = picture;
     this.token = token;
+    this.expiresAt = new Date();
+    this.provider = provider; // I
   }
 }
-
-export interface RequestUserGoogle {
-  idGoogle: string;
-  fullName: string;
-  email: string;
-  picture: string;
-  token: string;
-}
-export interface FindUserGoogleTreidi
-  extends Omit<
-    UserGoogleTreidi,
-    "fullName" | "idGoogle" | "picture" | "token"
-  > {}
