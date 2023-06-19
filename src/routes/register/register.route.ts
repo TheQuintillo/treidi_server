@@ -28,18 +28,24 @@ router.post("/", async (req, res) => {
           req.user as UserFacebookTreidi,
           findUser.id
         );
-        res.json({ user: findUser });
+        return res.json({ user: findUser });
       } else if (findUser && provider === "google") {
         const foreignTokenGoogle = await google.createUser(
           req.user as UserGoogleTreidi,
           findUser.id
         );
+        return res.json({ user: "User Created Successfully" });
       }
-      res.json({ user: "User Created Successfully" });
+      return res.json({ user: "User Created Successfully" });
     } else {
+      // Lógica adicional si es necesario
     }
-  } catch (err) {
-    res.status(500).json({ message: "Email registrado" });
+  } catch (err: any) {
+    if (err.message === "Email registrado") {
+      return res.status(500).json({ message: "Email ya registrado" });
+    } else {
+      return res.status(409).json({ message: "Error en el servidor" });
+    }
   }
 });
 
