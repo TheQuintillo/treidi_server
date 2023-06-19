@@ -4,6 +4,7 @@ import { PORT } from "./config/env";
 import indexRouter from "./routes/index.route";
 import authGoogle from "./routes/auth/authGoogle.routes";
 import authFacebook from "./routes/auth/authFacebook.routes";
+import productRouter from "./routes/products/products.route";
 import registerRouter from "./routes/register/register.route";
 import passport from "passport";
 import session from "./middlewares/session.middleware";
@@ -19,6 +20,7 @@ app.use(passport.session());
 
 app.use("/auth-google", authGoogle);
 app.use("/auth-facebook", authFacebook);
+app.use("/products", productRouter);
 app.use("/register", registerRouter);
 app.use("/", indexRouter);
 
